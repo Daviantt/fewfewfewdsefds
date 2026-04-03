@@ -12,90 +12,72 @@ import java.util.List;
  */
 
 public class SachBUS {
-    private SachDAO sachdao = new SachDAO();
-    private ArrayList<Sach> dss = new ArrayList<Sach>();
-    
-    public SachBUS(){
-        dss = sachdao.loadSach();
+    private final SachDAO sachDAO = new SachDAO();
+    private List<Sach> dss = new ArrayList<>();
+
+    public SachBUS() {
+        dss = sachDAO.loadSach();
     }
-    
-    public ArrayList<Sach> getSachBUS(){
+
+    public List<Sach> getAll() {
         return dss;
     }
-    
-    //ham kiem tra
-    public boolean ktmasach(String ma){
-        return timSachTheoMa(ma) != null;
-    }
-    
-    //them sua xoa
 
-        
+    public void reload() {
+        dss = sachDAO.loadSach();
+    }
 
-    public Result themSach(Sach sach){
-
-       if(sach.getMasach().isEmpty() || sach.getTensach().isEmpty() || sach.getMatg().isEmpty() || sach.getMatl().isEmpty() || sach.getNamxuatban() == 0 || sach.getManxb().isEmpty() || sach.getDongia() == 0 || sach.getSoluongton() == 0){
-           return Result.thieuthongtin;
-       }
-       if(!ktmasach(sach.getMasach())){
-           if(!sachdao.insertSach(sach)){
-               return Result.thatbai;
-           }
-       }else{
-           return Result.trungma;
-       }
-       dss.add(sach);
-       return Result.thanhcong;
-    }
-    
-    public Result xoaSach(String ma){
-        if(ktmasach(ma)){
-            if(!sachdao.deleteSach(ma)){
-                return Result.thatbai;
-            }
-        }else{
-            return Result.khongtontai;
-        }
-        Sach s = timSachTheoMa(ma);
-        if(s != null){
-            dss.remove(s);
-        }
-        return Result.thanhcong;
-    }
-    
-    public Result suaSach(Sach sach){
-        if(ktmasach(sach.getMasach())){
-            if(!sachdao.updateSach(sach)){
-                return Result.thatbai;
-            }
-        }else{
-            return Result.khongtontai;
-        }
-        int i = dss.indexOf(sach);
-        if(i != -1){
-            dss.set(i,sach);
-        }
-        return Result.thanhcong;
-    }
-    
-    //Tim kiem
-    public Sach timSachTheoMa(String ma){
-        for(Sach s : dss){
-            if(s.getMasach().equals(ma)){
-                return s;
-            }
+    public Sach timSachTheoMa(String ma) {
+        for (Sach s : dss) {
+            if (s.getMasach().equalsIgnoreCase(ma)) return s;
         }
         return null;
     }
-    
-    public ArrayList<Sach> timSachTheoTen(String ten){
-        ArrayList<Sach> rs = new ArrayList<Sach>();
-        for(Sach s : dss){
-            if(s.getTensach().toLowerCase().contains(ten.toLowerCase())){
-                rs.add(s);
-            }
+
+    public List<Sach> timSachTheoTen(String ten) {
+        List<Sach> rs = new ArrayList<>();
+        for (Sach s : dss) {
+            if (s.getTensach().toLowerCase().contains(ten.toLowerCase())) rs.add(s);
         }
         return rs;
+    }
+
+    public Result themSach(Sach sach) {
+        if (sach.getMasach() == null || sach.getMasach().isBlank()
+                || sach.getTensach() == null || sach.getTensach().isBlank()
+                || sach.getMatg() == null || sach.getMatg().isBlank()
+                || sach.getMatl() == null || sach.getMatl().isBlank()
+                || sach.getManxb() == null || sach.getManxb().isBlank()
+                || sach.getNamxuatban() <= 0 || sach.getDongia() <= 0 || sach.getSoluongton() < 0) {
+            return Result.thieuthongtin;
+        }
+
+        if (timSachTheoMa(sach.getMasach()) != null) return Result.trungma;
+        if (!sachDAO.insertSach(sach)) return Result.thatbai;
+
+        dss.add(sach);
+        return Result.thanhcong;
+    }
+
+    public Result suaSach(Sach sach) {
+        if (timSachTheoMa(sach.getMasach()) == null) return Result.khongtontai;
+        if (!sachDAO.updateSach(sach)) return Result.thatbai;
+
+        int idx = dss.indexOf(sach);
+        if (idx != -1) dss.set(idx, sach);
+        return Result.thanhcong;
+    }
+
+    public Result xoaSach(String ma) {
+        if (timSachTheoMa(ma) == null) return Result.khongtontai;
+        if (!sachDAO.deleteSach(ma)) return Result.thatbai;
+
+        dss.removeIf(s -> s.getMasach().equalsIgnoreCase(ma));
+        return Result.thanhcong;
+    }
+
+    public int thongKeSoLuongSach(List<Sach> ds) {
+        return ds == null ? 0 : ds.size();
     }
     
     public ArrayList<Sach> timSachTheoMaTacGia(String matg){
