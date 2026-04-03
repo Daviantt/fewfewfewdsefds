@@ -13,13 +13,13 @@ import java.util.List;
 
 public class SachBUS {
     private final SachDAO sachDAO = new SachDAO();
-    private List<Sach> dss = new ArrayList<>();
+    private ArrayList<Sach> dss = new ArrayList<>();
 
     public SachBUS() {
         dss = sachDAO.loadSach();
     }
 
-    public List<Sach> getAll() {
+    public ArrayList<Sach> getAll() {
         return dss;
     }
 
@@ -185,66 +185,7 @@ public class SachBUS {
         return sachSapHet(0);
     }
     
-    public int thongKeSoLuongSach(ArrayList<Sach> dstemp){
-        int cnt = 0;
-        for(Sach s : dstemp){
-            cnt++;
-        }
-        return cnt;
-    }
-    
     public void sachreload(){
-        dss = sachdao.loadSach();
+        dss = sachDAO.loadSach();
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    //
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
